@@ -59,6 +59,11 @@ drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created after insert on auth.users
   for each row execute function public.handle_new_user();
 
+-- Backfill profiles for anyone who signed up before this script ran.
+insert into public.profiles (id, email, name)
+select u.id, u.email, coalesce(u.raw_user_meta_data->>'name','') from auth.users u
+where not exists (select 1 from public.profiles p where p.id = u.id);
+
 -- ---------- Work (audio posts) ----------
 create table if not exists public.works (
   id uuid primary key default gen_random_uuid(),
