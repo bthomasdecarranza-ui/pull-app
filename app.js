@@ -553,7 +553,7 @@ async function renderFeed() {
       if (f.kind === 'member') what = `${link(f.actor_id)} joined Pull${a && a.roles?.length ? ` as ${esc(roleLabel(a.roles))}` : ''}.`;
       else if (f.kind === 'accept') what = `${link(f.actor_id)} accepted ${link(f.target_id)} for a ${esc(f.make_type)}.`;
       else if (f.kind === 'collab') what = `${link(f.actor_id)} and ${link(f.target_id)} confirmed a ${esc(f.make_type)}.`;
-      else what = `${link(f.actor_id)} is on the Board this week. ${icon('up', 'accent')}`;
+      else what = `${f.actor_id === me.id ? `<a href="#you"><b>You're</b></a>` : link(f.actor_id) + ' is'} on the Board this week. ${icon('up', 'accent')}`;
       const w = f.kind === 'collab' ? works.get(f.work_id) : null;
       return `<div class="card feed-item"><a href="#u/${f.actor_id}">${avatar(a, 'md')}</a><div class="what"><div>${what}</div>${w ? playerHTML(w, true) : ''}</div><time>${timeAgo(f.at)}</time></div>`;
     });
