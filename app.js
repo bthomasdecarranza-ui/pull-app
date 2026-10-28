@@ -229,8 +229,8 @@ async function renderBoard() {
         : `<div class="empty"><b>${boardMode === 'week' ? "Nobody's been chosen yet this week." : 'No confirmed collabs yet.'}</b>${boardMode === 'week' ? 'Be first.' : 'Ask someone to work with you.'}<div style="margin-top:14px"><a class="btn sm primary" href="#members">Browse members</a></div></div>`}
       </div>`;
     $('.page').innerHTML = body;
-    $$('.seg button').forEach(b => b.onclick = () => { boardMode = b.dataset.m; renderBoard(); });
-    $$('.chip').forEach(b => b.onclick = () => { boardRole = b.dataset.r; renderBoard(); });
+    $$('.page .seg button').forEach(b => b.onclick = () => { boardMode = b.dataset.m; renderBoard(); });
+    $$('.page .chip').forEach(b => b.onclick = () => { boardRole = b.dataset.r; renderBoard(); });
   } catch (e) { $('.page').innerHTML = `<div class="empty">${esc(niceError(e))}</div>`; }
 }
 
@@ -254,7 +254,7 @@ async function renderMembers() {
       <p class="small muted" style="margin:6px 0 10px">${data.length} member${data.length === 1 ? '' : 's'} on Pull</p><div class="list" id="mlist"></div>`;
     draw();
     $('#q').oninput = e => { q = e.target.value.trim().toLowerCase(); draw(); };
-    $$('.chip').forEach(b => b.onclick = () => { role = b.dataset.r; $$('.chip').forEach(c => c.classList.toggle('on', c === b)); draw(); });
+    $$('.page .chip').forEach(b => b.onclick = () => { role = b.dataset.r; $$('.page .chip').forEach(c => c.classList.toggle('on', c === b)); draw(); });
   } catch (e) { $('.page').innerHTML = `<div class="empty">${esc(niceError(e))}</div>`; }
 }
 
@@ -490,7 +490,7 @@ async function renderAsks() {
       return `<div class="card"><div class="row"><a href="#u/${other?.id}">${avatar(other, 'md')}</a><div class="grow"><div class="name"><b>${esc(c.make_type)}</b> with ${esc(dispName(other))}</div><div class="small muted">${line}</div></div>${action}</div>${w ? `<div style="margin-top:10px">${playerHTML(w, true)}</div>` : ''}</div>`;
     };
     const draw = () => {
-      $$('.seg button').forEach(b => b.classList.toggle('on', b.dataset.s === asksSeg));
+      $$('.page .seg button').forEach(b => b.classList.toggle('on', b.dataset.s === asksSeg));
       let html;
       if (asksSeg === 'received') html = rec.length ? `${pending.length ? '' : `<p class="small muted" style="margin:0 0 10px">${lim.accepts_left} accept${lim.accepts_left === 1 ? '' : 's'} left this week.</p>`}` + [...pending, ...rec.filter(a => a.status !== 'pending')].map(a => askCard(a, 'in')).join('') : `<div class="empty"><b>Nobody has asked you yet.</b>Post work. Get seen. Get asked.</div>`;
       else if (asksSeg === 'sent') html = sent.length ? sent.map(a => askCard(a, 'out')).join('') : `<div class="empty"><b>You haven't asked anyone.</b>You get 5 a week. Use them.<div style="margin-top:12px"><a class="btn sm primary" href="#members">Browse members</a></div></div>`;
@@ -507,7 +507,7 @@ async function renderAsks() {
     };
     $('.page').innerHTML = `<div class="card tight row" style="margin-bottom:4px"><div class="grow small"><b>${lim.asks_left}</b> asks left · <b>${lim.accepts_left}</b> accepts left</div><span class="pill">resets Monday</span></div>
       <div class="seg">${[['received','Received'],['sent','Sent'],['collabs','Collabs']].map(([k, l]) => `<button data-s="${k}">${l}${counts[k] ? ` <span class="pill hot">${counts[k]}</span>` : ''}</button>`).join('')}</div><div class="list" id="asklist"></div>`;
-    $$('.seg button').forEach(b => b.onclick = () => { asksSeg = b.dataset.s; draw(); });
+    $$('.page .seg button').forEach(b => b.onclick = () => { asksSeg = b.dataset.s; draw(); });
     draw();
   } catch (e) { $('.page').innerHTML = `<div class="empty">${esc(niceError(e))}</div>`; }
 }
@@ -647,6 +647,6 @@ async function boot() {
   });
   if (session) { try { await loadMe(); } catch (e) { fail(e); } }
   render();
-  if (session && me && !me.roles?.length) editProfileSheet(true);
+  if (session && me && !me.roles?.length && !$('.sheet')) editProfileSheet(true);
 }
 boot();
